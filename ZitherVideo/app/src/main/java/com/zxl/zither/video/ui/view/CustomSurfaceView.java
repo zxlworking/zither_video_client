@@ -47,6 +47,7 @@ public class CustomSurfaceView extends SurfaceView {
             public void onPrepared(MediaPlayer mp) {
                 DebugUtil.d(TAG,"onPrepared");
                 mp.start();
+                mp.setScreenOnWhilePlaying(true);
                 if(mIMediaPlayerListener != null){
                     mIMediaPlayerListener.onPrepared(mp);
                 }
@@ -100,6 +101,22 @@ public class CustomSurfaceView extends SurfaceView {
                     mIMediaPlayerListener.onCompletion(mp);
                 }
                 mp.start();
+                mp.setScreenOnWhilePlaying(false);
+            }
+        });
+        mMediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+            @Override
+            public void onSeekComplete(MediaPlayer mp) {
+                DebugUtil.d(TAG,"onSeekComplete");
+
+            }
+        });
+        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                DebugUtil.d(TAG,"onError");
+                closeMediaPlayer();
+                return false;
             }
         });
 
@@ -116,8 +133,8 @@ public class CustomSurfaceView extends SurfaceView {
 
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
-                mMediaPlayer.stop();
-                mMediaPlayer.release();
+                DebugUtil.d(TAG,"surfaceDestroyed");
+                closeMediaPlayer();
             }
         });
     }
@@ -134,14 +151,29 @@ public class CustomSurfaceView extends SurfaceView {
         mMediaPlayer.reset();
 
         try {
-            HttpGetProxy httpGetProxy = new HttpGetProxy(1234);
-            String localUrl = httpGetProxy.getLocalURL(videoUrl);
-            httpGetProxy.asynStartProxy();
+            String localUrl = HttpGetProxy.getInstance().getLocalURL(videoUrl);
             DebugUtil.d(TAG,"setDataSource::localUrl = " + localUrl);
             mMediaPlayer.setDataSource(localUrl);
             mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        DebugUtil.d(TAG,"onDetachedFromWindow");
+        super.onDetachedFromWindow();
+        closeMediaPlayer();
+        HttpGetProxy.getInstance().stop();
+    }
+
+    private void closeMediaPlayer(){
+        setKeepScreenOn(false);
+        if (mMediaPlayer != null) {
+            mMediaPlayer.reset();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
         }
     }
 }

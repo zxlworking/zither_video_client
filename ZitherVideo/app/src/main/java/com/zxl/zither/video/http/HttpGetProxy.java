@@ -21,96 +21,130 @@ public class HttpGetProxy {
     final static private String LOCAL_IP_ADDRESS_1 = "127.0.0.1";
     final static private String LOCAL_IP_ADDRESS_2 = "10.0.2.2";
     final static private int HTTP_PORT = 80;
-    final static private String HTTP_END="\r\n\r\n";
+    final static private String HTTP_END = "\r\n\r\n";
 
-    /**代理服务器使用的端口*/
+    /**
+     * 代理服务器使用的端口
+     */
     private int proxy_ip_port;
-    /**链接带的端口*/
+    /**
+     * 链接带的端口
+     */
     private String original_ip_port;
-    /**远程服务器地址*/
+    /**
+     * 远程服务器地址
+     */
     private String remoteHost;
-    /**本地服务器地址*/
+    /**
+     * 本地服务器地址
+     */
     private String localHost;
     private ServerSocket localServer = null;
-    /**收发Media Player请求的Socket*/
+    /**
+     * 收发Media Player请求的Socket
+     */
     private Socket sckPlayer = null;
-    /**收发Media Server请求的Socket*/
+    /**
+     * 收发Media Server请求的Socket
+     */
     private Socket sckServer = null;
 
     private SocketAddress address;
 
+    private boolean isStop = false;
+
+    private static HttpGetProxy mHttpGetProxy;
+
+    public static HttpGetProxy getInstance() {
+        if (mHttpGetProxy == null) {
+            mHttpGetProxy = new HttpGetProxy(1234);
+        }
+        return mHttpGetProxy;
+    }
+
     /**
      * 初始化代理服务器
+     *
      * @param localport 代理服务器监听的端口
      */
-    public HttpGetProxy(int localport) {
+    private HttpGetProxy(int localport) {
         try {
-            _HttpGetProxy(LOCAL_IP_ADDRESS_1,localport);
+            _HttpGetProxy(LOCAL_IP_ADDRESS_1, localport);
         } catch (Exception e) {
-            DebugUtil.d(TAG,LOCAL_IP_ADDRESS_1+"???"+e.toString());
+            DebugUtil.d(TAG, LOCAL_IP_ADDRESS_1 + "???" + e.toString());
             try {
-                _HttpGetProxy(LOCAL_IP_ADDRESS_2,localport);
-            }catch (Exception e1) {
-                DebugUtil.d(TAG,LOCAL_IP_ADDRESS_2+"???"+e.toString());
+                _HttpGetProxy(LOCAL_IP_ADDRESS_2, localport);
+            } catch (Exception e1) {
+                DebugUtil.d(TAG, LOCAL_IP_ADDRESS_2 + "???" + e.toString());
                 System.exit(0);
             }
         }
     }
 
-    private void _HttpGetProxy(String ipAddress,int localport) throws UnknownHostException, IOException {
+    private void _HttpGetProxy(String ipAddress, int localport) throws UnknownHostException, IOException {
         proxy_ip_port = localport;
-        localServer = new ServerSocket(localport,1, InetAddress.getByName(ipAddress));
-        localHost=ipAddress;
+        localHost = ipAddress;
     }
 
     /**
      * 把网络URL转为本地URL，127.0.0.1替换网络域名
+     *
      * @param urlString 网络URL
      * @return 本地URL
      */
-    public String getLocalURL(String urlString){
+    public String getLocalURL(String urlString) {
         //----排除HTTP特殊----//
-        String targetUrl=urlString;
+        String targetUrl = urlString;
         //----获取对应本地代理服务器的链接----//
         String result = null;
-        URI originalURI=URI.create(targetUrl);
-        remoteHost=originalURI.getHost();
-        if(originalURI.getPort()!=-1){//URL带Port
-            address = new InetSocketAddress(remoteHost,originalURI.getPort());//使用默认端口
-            original_ip_port = originalURI.getPort()+"";//保存端口，中转时替换
-            result=targetUrl.replace(remoteHost+":"+originalURI.getPort(),
-                    localHost+":"+proxy_ip_port);
-        }
-        else{//URL不带Port
-            address = new InetSocketAddress(remoteHost,HTTP_PORT);//使用80端口
+        URI originalURI = URI.create(targetUrl);
+        remoteHost = originalURI.getHost();
+        if (originalURI.getPort() != -1) {//URL带Port
+            address = new InetSocketAddress(remoteHost, originalURI.getPort());//使用默认端口
+            original_ip_port = originalURI.getPort() + "";//保存端口，中转时替换
+            result = targetUrl.replace(remoteHost + ":" + originalURI.getPort(),
+                    localHost + ":" + proxy_ip_port);
+        } else {//URL不带Port
+            address = new InetSocketAddress(remoteHost, HTTP_PORT);//使用80端口
             original_ip_port = "";
-            result=targetUrl.replace(remoteHost,localHost+":"+proxy_ip_port);
+            result = targetUrl.replace(remoteHost, localHost + ":" + proxy_ip_port);
         }
+        stop();
+        start();
         return result;
     }
 
     /**
      * 启动代理服务器
+     *
      * @throws IOException
      */
-    public void asynStartProxy(){
+    private void asynStartProxy() {
         new Thread() {
             public void run() {
                 int bytes_read;
                 byte[] local_request = new byte[1024];
                 byte[] remote_reply = new byte[1024];
-                while (true) {
+                while (!isStop) {
+                    DebugUtil.d(TAG, "..........start..........");
                     try {
                         //--------------------------------------
                         //监听MediaPlayer的请求，MediaPlayer->代理服务器
                         //--------------------------------------
+                        if(localServer == null){
+                            DebugUtil.d(TAG, "..........localServer == null..........");
+                            localServer = new ServerSocket(proxy_ip_port, 1, InetAddress.getByName(localHost));
+                        }
+                        if(isStop){
+                            break;
+                        }
                         sckPlayer = localServer.accept();
                         DebugUtil.d(TAG, "..........sckPlayer connected..........");
 
                         String requestStr = "";
                         while ((bytes_read = sckPlayer.getInputStream().read(local_request)) != -1) {
-                            byte[] tmpBuffer=new byte[bytes_read];
-                            System.arraycopy(local_request,0,tmpBuffer,0,bytes_read);
+                            byte[] tmpBuffer = new byte[bytes_read];
+                            System.arraycopy(local_request, 0, tmpBuffer, 0, bytes_read);
                             String str = new String(tmpBuffer);
                             //Log.e("from MediaPlayer---->", str);
                             requestStr = requestStr + str;
@@ -118,33 +152,40 @@ public class HttpGetProxy {
                                     && requestStr.contains(HTTP_END)) {
                                 break;
                             }
+                            if(isStop){
+                                break;
+                            }
                         }
 
                         //把request中的本地ip改为远程ip
-                        requestStr = requestStr.replace(localHost,remoteHost);
+                        requestStr = requestStr.replace(localHost, remoteHost);
                         //把代理服务器端口改为原URL端口
-                        if(TextUtils.isEmpty(original_ip_port))
-                            requestStr = requestStr.replace(":"+proxy_ip_port, "");
+                        if (TextUtils.isEmpty(original_ip_port))
+                            requestStr = requestStr.replace(":" + proxy_ip_port, "");
                         else
-                            requestStr = requestStr.replace(":"+proxy_ip_port, ":"+original_ip_port);
+                            requestStr = requestStr.replace(":" + proxy_ip_port, ":" + original_ip_port);
 
-                        DebugUtil.d("to Media Server---->", requestStr);
+                        if(isStop){
+                            break;
+                        }
+
+                        DebugUtil.d(TAG, "to Media Server---->" + requestStr);
                         //--------------------------------------
                         //把MediaPlayer的请求发到网络服务器，代理服务器->网络服务器
                         //--------------------------------------
                         sckServer = new Socket();
                         sckServer.connect(address);
-                        DebugUtil.d(TAG,"..........remote Server connected..........");
+                        DebugUtil.d(TAG, "..........remote Server connected..........");
                         sckServer.getOutputStream().write(requestStr.getBytes());//发送MediaPlayer的请求
                         //------------------------------------------------------
                         //把网络服务器的反馈发到MediaPlayer，网络服务器->代理服务器->MediaPlayer
                         //------------------------------------------------------
-                        DebugUtil.d(TAG,"..........remote start to receive..........");
+                        DebugUtil.d(TAG, "..........remote start to receive..........");
                         String responseStr = "";
-                        boolean isCaptured=false;
+                        boolean isCaptured = false;
                         while ((bytes_read = sckServer.getInputStream().read(remote_reply)) != -1) {
-                            byte[] tmpBuffer=new   byte[bytes_read];
-                            System.arraycopy(remote_reply,0,tmpBuffer,0,bytes_read);
+                            byte[] tmpBuffer = new byte[bytes_read];
+                            System.arraycopy(remote_reply, 0, tmpBuffer, 0, bytes_read);
                             //----捕获收到的Response文本内容----//
                             if (!isCaptured) {
                                 String str = new String(tmpBuffer);
@@ -152,26 +193,60 @@ public class HttpGetProxy {
                                 if (responseStr.contains("HTTP/")
                                         && responseStr.contains(HTTP_END)) {
 
-                                    int endIndex=responseStr.indexOf(HTTP_END, 0);
-                                    responseStr=responseStr.substring(0, endIndex);
-                                    DebugUtil.d("from Media Server---->", responseStr);
-                                    isCaptured=true;
+                                    int endIndex = responseStr.indexOf(HTTP_END, 0);
+                                    responseStr = responseStr.substring(0, endIndex);
+                                    DebugUtil.d(TAG, "from Media Server---->" + responseStr);
+                                    isCaptured = true;
                                 }
                             }
                             sckPlayer.getOutputStream().write(tmpBuffer);
                             sckPlayer.getOutputStream().flush();
+
+                            if(isStop){
+                                break;
+                            }
                         }
                         DebugUtil.d(TAG, "..........over..........");
-
-                        //关闭对内，对内 2个SOCKET
-                        sckPlayer.close();
-                        sckServer.close();
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
+                    } finally {
+                        closeServer();
                     }
+                    DebugUtil.d(TAG, "..........stop..........");
                 }
+                DebugUtil.d(TAG, "..........finish..........");
             }
         }.start();
+    }
+
+    private void closeServer(){
+        //关闭对内，对内 2个SOCKET
+        try {
+            if (sckServer != null) {
+                sckServer.close();
+                sckServer = null;
+            }
+            if (sckPlayer != null) {
+                sckPlayer.close();
+                sckPlayer = null;
+            }
+            if (localServer != null) {
+                localServer.close();
+                localServer = null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void start(){
+        isStop = false;
+        asynStartProxy();
+    }
+
+    public void stop(){
+        isStop = true;
+        closeServer();
     }
 }
