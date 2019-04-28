@@ -5,15 +5,18 @@ import com.zxl.zither.video.model.response.LoginResponseBean;
 import com.zxl.zither.video.model.response.ResponseBaseBean;
 import com.zxl.zither.video.model.response.VideoFileInfoResponse;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 import rx.Observable;
@@ -30,7 +33,9 @@ public interface HttpAPI {
     @GET("get_video_file_list")
     public Observable<VideoFileInfoResponse> getVideoFileList();
 
+//    @Multipart
     @POST("upload_video_file")
+//    public Observable<ResponseBaseBean> uploadVideoFile(@QueryMap Map<String,String> params, @PartMap HashMap<String,RequestBody> bodyMap);
     public Observable<ResponseBaseBean> uploadVideoFile(@QueryMap Map<String,String> params, @Body RequestBody multipartBody);
 //    public Call<ResponseBody> uploadVideoFile(@QueryMap Map<String,String> params, @Body RequestBody multipartBody);
 

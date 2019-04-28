@@ -63,8 +63,10 @@ public class CustomSurfaceView extends SurfaceView {
                 }
                 if(mVideoControlView != null){
                     mVideoControlView.setPrepared();
+                    mVideoControlView.isPlaying(true);
                 }
                 isPlaying = true;
+
             }
         });
         mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
@@ -168,6 +170,10 @@ public class CustomSurfaceView extends SurfaceView {
         int videoWidth = mp.getVideoWidth();
         int videoHeight = mp.getVideoHeight();
         DebugUtil.d(TAG,"onVideoSizeChanged::videoWidth = " + videoWidth + "::videoHeight = " + videoHeight);
+
+        if(videoWidth == 0 || videoHeight == 0){
+            return;
+        }
 
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(0, 0);
         int width;

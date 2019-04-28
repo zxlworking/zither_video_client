@@ -38,6 +38,8 @@ public class VideoControlView extends LinearLayout {
 
     private Object mLock = new Object();
 
+    private boolean isPlaying = false;
+
     private Runnable mLoopRunnable = new Runnable() {
         @Override
         public void run() {
@@ -48,6 +50,9 @@ public class VideoControlView extends LinearLayout {
                         return;
                     }
                     synchronized (mLock){
+                        if(!isPlaying){
+                            return;
+                        }
                         long currentTime = mMediaPlayer.getCurrentPosition();
                         long totalTime = mMediaPlayer.getDuration();
                         mSeekBar.setProgress((int) (currentTime * 100 / totalTime));
@@ -201,13 +206,20 @@ public class VideoControlView extends LinearLayout {
 
     public void setPrepared(){
         mTaskHandler.post(mLoopRunnable);
+        isPlaying(true);
     }
 
     public void setComplete(){
         mTaskHandler.removeCallbacks(mLoopRunnable);
+        isPlaying(false);
     }
 
     public void setError(){
         mTaskHandler.removeCallbacks(mLoopRunnable);
+        isPlaying(false);
+    }
+
+    public void isPlaying(boolean b){
+        isPlaying = b;
     }
 }

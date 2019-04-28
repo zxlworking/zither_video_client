@@ -1,10 +1,14 @@
 package com.zxl.zither.video.ui.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,16 +38,20 @@ import retrofit2.Response;
 public class UpLoadVideoFileActivity extends BaseActivity {
     private static final String TAG = "UpLoadVideoFileActivity";
 
+    private static final int OPEN_GALLERY_REQUEST_CODE = 1;
+
     public static final String UPLOAD_VIDEO_FILE_PATH_EXTRA = "VIDEO_PLAY_EXTRA";
 
-    private TextInputEditText mVideoNameInputEt;
-    private TextInputEditText mVideoDescInputEt;
+    private EditText mVideoNameInputEt;
+    private EditText mVideoDescInputEt;
     private View mUploadVideoFileView;
     private TextView mUploadProgressTv;
+    private ImageView mVideoImg;
 
     private DecimalFormat mDecimalFormat = new DecimalFormat("#.##");
 
     private String mUploadVideoFilePath;
+    private String mUploadVideoImgFilePath;
 
     private RetrofitCallback mRetrofitCallback = new RetrofitCallback() {
         @Override
@@ -98,6 +106,7 @@ public class UpLoadVideoFileActivity extends BaseActivity {
         mVideoDescInputEt = findViewById(R.id.video_desc_input_et);
         mUploadVideoFileView = findViewById(R.id.upload_video_file_view);
         mUploadProgressTv = findViewById(R.id.upload_progress_tv);
+        mVideoImg = findViewById(R.id.video_img);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
@@ -108,6 +117,15 @@ public class UpLoadVideoFileActivity extends BaseActivity {
             mVideoNameInputEt.setText(uploadVideoFile.getName());
 
         }
+
+        mVideoImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mOpenGalleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                mOpenGalleryIntent.setType("image/*");
+                startActivityForResult(mOpenGalleryIntent,OPEN_GALLERY_REQUEST_CODE);
+            }
+        });
 
         mUploadVideoFileView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -126,16 +144,31 @@ public class UpLoadVideoFileActivity extends BaseActivity {
                 }
 
                 File uploadVideoFile = new File(mUploadVideoFilePath);
+                File uploadVideoImgFile = new File(mUploadVideoImgFilePath);
+
+//                MultipartBody.Builder builder = new MultipartBody.Builder();
+//
+//                RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), uploadVideoFile);
+//                builder.addFormDataPart("file", uploadVideoFile.getName(), requestBody);
+//                builder.setType(MultipartBody.FORM);
+//
+//                MultipartBody multipartBody = builder.build();
+//                FileRequestBody fileRequestBody = new FileRequestBody(multipartBody,mRetrofitCallback);
+
+
+                RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), uploadVideoFile);
+                RequestBody requestBody2 = RequestBody.create(MediaType.parse("multipart/form-data"), uploadVideoImgFile);
+//                HashMap<String, RequestBody> map = new HashMap<>();
+//                map.put(uploadVideoFile.getName(), requestBody);
+//                map.put(uploadVideoImgFile.getName(), requestBody2);
 
                 MultipartBody.Builder builder = new MultipartBody.Builder();
-
-                RequestBody requestBody = RequestBody.create(MediaType.parse("video/*"), uploadVideoFile);
-                builder.addFormDataPart("file", uploadVideoFile.getName(), requestBody);
+                builder.addFormDataPart("value", uploadVideoFile.getName(), requestBody);
+                builder.addFormDataPart("value", uploadVideoImgFile.getName(), requestBody2);
                 builder.setType(MultipartBody.FORM);
-
-
                 MultipartBody multipartBody = builder.build();
                 FileRequestBody fileRequestBody = new FileRequestBody(multipartBody,mRetrofitCallback);
+
 
                 Map<String,String> params = new HashMap<>();
                 params.put("video_name", mVideoNameInputEt.getText().toString());
@@ -167,5 +200,27 @@ public class UpLoadVideoFileActivity extends BaseActivity {
                 });
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        DebugUtil.d(TAG,"onActivityResult::requestCode = " + requestCode);
+        DebugUtil.d(TAG,"onActivityResult::resultCode = " + resultCode);
+
+        if(resultCode == RESULT_OK){
+            switch (requestCode){
+                case OPEN_GALLERY_REQUEST_CODE:
+                    if(data == null){
+                        DebugUtil.d(TAG,"onActivityResult::GALLERY_OPEN_REQUEST_CODE::data null");
+                    }else{
+                        DebugUtil.d(TAG,"onActivityResult::GALLERY_OPEN_REQUEST_CODE::data = " + data.getData());
+                        String mGalleryPath = CommonUtils.parseGalleryPath(mActivity,data.getData());
+                        DebugUtil.d(TAG,"onActivityResult::GALLERY_OPEN_REQUEST_CODE::mGalleryPath = " + mGalleryPath);
+                        mUploadVideoImgFilePath = mGalleryPath;
+                    }
+                    break;
+            }
+        }
     }
 }

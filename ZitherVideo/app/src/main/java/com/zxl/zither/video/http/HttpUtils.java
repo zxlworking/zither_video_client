@@ -15,10 +15,12 @@ import com.zxl.zither.video.model.response.VideoFileInfoResponse;
 import com.zxl.zither.video.utils.Constants;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
