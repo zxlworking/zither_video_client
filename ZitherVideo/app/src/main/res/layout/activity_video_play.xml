@@ -10,29 +10,38 @@
         android:id="@+id/video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
-    <com.zxl.zither.video.ui.view.CustomSurfaceView
-        android:id="@+id/surfaceView"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:visibility="visible"/>
+        android:layout_height="match_parent">
+
+        <com.zxl.zither.video.ui.view.CustomSurfaceView
+            android:id="@+id/surfaceView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:visibility="visible" />
+        <com.zxl.zither.video.ui.view.VideoControlView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#3399aa"/>
+    </RelativeLayout>
 
     <include
         android:id="@+id/loading_view"
+        layout="@layout/loading_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        layout="@layout/loading_view"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <include
         android:id="@+id/load_error_view"
+        layout="@layout/load_error_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        layout="@layout/load_error_view"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
 </FrameLayout>

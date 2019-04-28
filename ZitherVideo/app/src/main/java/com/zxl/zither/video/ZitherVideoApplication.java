@@ -1,6 +1,7 @@
 package com.zxl.zither.video;
 
 import android.app.Application;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.zxl.common.DebugUtil;
 import com.zxl.zither.video.common.GlobalCrashHandler;
@@ -15,5 +16,6 @@ public class ZitherVideoApplication extends Application {
         EventBusUtils.init();
 
         GlobalCrashHandler.getInstance(this);
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);//低版本支持全屏的矢量图标
     }
 }

@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:width="100dp"
+        android:height="100dp"
+        android:viewportWidth="100"
+        android:viewportHeight="100">
+    <path
+        android:name="ic_play_vector_path"
+        android:strokeColor="#000000"
+        android:pathData="M25,25 L25,75 M25,75 L75,50 L25,25"/>
+</vector>

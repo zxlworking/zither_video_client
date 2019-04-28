@@ -44,7 +44,6 @@
 
         <activity android:name=".ui.activity.VideoPlayActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"
-            android:screenOrientation="landscape"
             android:launchMode="singleTop"/>
 
         <activity android:name=".ui.activity.UpLoadVideoFileActivity"
