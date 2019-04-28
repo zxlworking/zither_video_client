@@ -3,6 +3,7 @@ package com.zxl.zither.video.ui.activity;
 import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.widget.AppCompatEditText;
 import android.support.v7.widget.CardView;
 import android.text.TextUtils;
 import android.view.View;
@@ -29,9 +30,9 @@ public class AccountActivity extends BaseActivity {
     private static final int LOGIN_SUCCESS_STATE = 3;
 
     private TextInputLayout mUserNameTextInputLayout;
-    private TextInputEditText mUserNameTextInputEditText;
+    private AppCompatEditText mUserNameTextInputEditText;
     private TextInputLayout mPassWordTextInputLayout;
-    private TextInputEditText mPassWordTextInputEditText;
+    private AppCompatEditText mPassWordTextInputEditText;
 
     private CardView mRegisterCardView;
     private CardView mLoginCardView;

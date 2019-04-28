@@ -10,6 +10,7 @@ import android.view.SurfaceView;
 import android.widget.FrameLayout;
 
 import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.http.HttpGetProxy;
 
 import java.io.IOException;
 
@@ -133,7 +134,11 @@ public class CustomSurfaceView extends SurfaceView {
         mMediaPlayer.reset();
 
         try {
-            mMediaPlayer.setDataSource(videoUrl);
+            HttpGetProxy httpGetProxy = new HttpGetProxy(1234);
+            String localUrl = httpGetProxy.getLocalURL(videoUrl);
+            httpGetProxy.asynStartProxy();
+            DebugUtil.d(TAG,"setDataSource::localUrl = " + localUrl);
+            mMediaPlayer.setDataSource(localUrl);
             mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
