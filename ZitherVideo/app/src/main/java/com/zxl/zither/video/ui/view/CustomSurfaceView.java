@@ -1,13 +1,17 @@
 package com.zxl.zither.video.ui.view;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import com.zxl.common.DebugUtil;
 import com.zxl.zither.video.http.HttpGetProxy;
@@ -19,9 +23,15 @@ public class CustomSurfaceView extends SurfaceView {
 
     private Context mContext;
 
+    private VideoControlView mVideoControlView;
+
     private MediaPlayer mMediaPlayer;
 
     private IMediaPlayerListener mIMediaPlayerListener;
+
+    private int mScreenOrientation = Configuration.ORIENTATION_PORTRAIT;
+
+    private boolean isPlaying = false;
 
     public CustomSurfaceView(Context context) {
         super(context);
@@ -51,6 +61,10 @@ public class CustomSurfaceView extends SurfaceView {
                 if(mIMediaPlayerListener != null){
                     mIMediaPlayerListener.onPrepared(mp);
                 }
+                if(mVideoControlView != null){
+                    mVideoControlView.setPrepared();
+                }
+                isPlaying = true;
             }
         });
         mMediaPlayer.setOnBufferingUpdateListener(new MediaPlayer.OnBufferingUpdateListener() {
@@ -75,22 +89,7 @@ public class CustomSurfaceView extends SurfaceView {
         mMediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
             @Override
             public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                width = getWidth();
-                height = getHeight();
-                DebugUtil.d(TAG,"onVideoSizeChanged::width = " + width + "::height = " + height);
-                int videoWidth = mp.getVideoWidth();
-                int videoHeight = mp.getVideoHeight();
-                DebugUtil.d(TAG,"onVideoSizeChanged::videoWidth = " + videoWidth + "::videoHeight = " + videoHeight);
-                if(videoWidth * height > videoHeight * width){
-                    height = videoHeight * width / videoWidth;
-                } else if(videoHeight * width > videoWidth * height){
-                    width = videoWidth * height / videoHeight;
-                }
-                DebugUtil.d(TAG,"onVideoSizeChanged::width = " + width + "::height = " + height);
-
-                FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width, height);
-                layoutParams.gravity = Gravity.CENTER;
-                setLayoutParams(layoutParams);
+                resetViewSize(mp);
             }
         });
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -100,8 +99,18 @@ public class CustomSurfaceView extends SurfaceView {
                 if(mIMediaPlayerListener != null){
                     mIMediaPlayerListener.onCompletion(mp);
                 }
-                mp.start();
                 mp.setScreenOnWhilePlaying(false);
+                if(mVideoControlView != null){
+                    mVideoControlView.setComplete();
+                }
+                isPlaying = false;
+
+                mp.start();
+                if(mVideoControlView != null){
+                    mVideoControlView.setPrepared();
+                }
+                isPlaying = true;
+
             }
         });
         mMediaPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
@@ -116,6 +125,10 @@ public class CustomSurfaceView extends SurfaceView {
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 DebugUtil.d(TAG,"onError");
                 closeMediaPlayer();
+                if(mVideoControlView != null){
+                    mVideoControlView.setError();
+                }
+                isPlaying = false;
                 return false;
             }
         });
@@ -137,10 +150,50 @@ public class CustomSurfaceView extends SurfaceView {
                 closeMediaPlayer();
             }
         });
+
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!isPlaying){
+                    return;
+                }
+                if(mVideoControlView != null){
+                    mVideoControlView.setVisibility(VISIBLE);
+                }
+            }
+        });
+    }
+
+    private void resetViewSize(MediaPlayer mp) {
+        int videoWidth = mp.getVideoWidth();
+        int videoHeight = mp.getVideoHeight();
+        DebugUtil.d(TAG,"onVideoSizeChanged::videoWidth = " + videoWidth + "::videoHeight = " + videoHeight);
+
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(0, 0);
+        int width;
+        int height;
+        if(mScreenOrientation == Configuration.ORIENTATION_PORTRAIT){
+            width = mContext.getResources().getDisplayMetrics().widthPixels;
+            height = videoHeight * width / videoWidth;
+        }else{
+            height = mContext.getResources().getDisplayMetrics().heightPixels;
+            width = videoWidth * height / videoHeight;
+        }
+        DebugUtil.d(TAG,"onVideoSizeChanged::width = " + width + "::height = " + height);
+
+        layoutParams.width = width;
+        layoutParams.height = height;
+        setLayoutParams(layoutParams);
+        //getHolder().setFixedSize(width, height);
     }
 
     public void setIMediaPlayerListener(IMediaPlayerListener listener){
         mIMediaPlayerListener = listener;
+    }
+
+    public void setVideoControlView(VideoControlView videoControlView){
+        mVideoControlView = videoControlView;
+        mVideoControlView.setMediaPlayer(mMediaPlayer);
     }
 
     public void setDataSource(String videoUrl){
@@ -166,6 +219,13 @@ public class CustomSurfaceView extends SurfaceView {
         super.onDetachedFromWindow();
         closeMediaPlayer();
         HttpGetProxy.getInstance().stop();
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        DebugUtil.d(TAG,"onConfigurationChanged::newConfig = " + newConfig.orientation + "::ORIENTATION_PORTRAIT = " + Configuration.ORIENTATION_PORTRAIT + "::ORIENTATION_LANDSCAPE = " + Configuration.ORIENTATION_LANDSCAPE);
+        resetViewSize(mMediaPlayer);
     }
 
     private void closeMediaPlayer(){

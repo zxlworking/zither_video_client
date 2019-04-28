@@ -6,10 +6,32 @@
 
     <ImageView
         android:id="@+id/play_pause_img"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_centerInParent="true"
-        android:background="#99aa33"
-        android:src="@drawable/ic_pause_vector_drawable"/>
+        android:src="@drawable/ic_pause_vector"/>
+
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:layout_alignParentBottom="true"/>
+
+    <TextView
+        android:id="@+id/current_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/seek_bar"
+        android:layout_alignLeft="@+id/seek_bar"
+        android:text="00:00"/>
+
+    <TextView
+        android:id="@+id/total_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/seek_bar"
+        android:layout_alignRight="@+id/seek_bar"
+        android:text="00:00"/>
 
 </RelativeLayout>

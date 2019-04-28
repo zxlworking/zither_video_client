@@ -20,12 +20,13 @@
             android:id="@+id/surfaceView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center"
             android:visibility="visible" />
         <com.zxl.zither.video.ui.view.VideoControlView
+            android:id="@+id/video_control_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#3399aa"/>
+            android:layout_alignBottom="@+id/surfaceView"
+            android:visibility="gone"/>
     </RelativeLayout>
 
     <include

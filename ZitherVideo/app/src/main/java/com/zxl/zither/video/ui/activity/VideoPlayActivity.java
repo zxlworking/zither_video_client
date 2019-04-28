@@ -1,5 +1,6 @@
 package com.zxl.zither.video.ui.activity;
 
+import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import com.zxl.zither.video.model.data.FileInfo;
 import com.zxl.zither.video.model.data.VideoFileInfo;
 import com.zxl.zither.video.ui.view.CustomSurfaceView;
 import com.zxl.zither.video.ui.view.IMediaPlayerListener;
+import com.zxl.zither.video.ui.view.VideoControlView;
 import com.zxl.zither.video.utils.Constants;
 
 import java.text.DecimalFormat;
@@ -29,6 +31,7 @@ public class VideoPlayActivity extends BaseActivity {
 
     private CustomSurfaceView mCustomSurfaceView;
     private VideoView videoView;
+    private VideoControlView mVideoControlView;
 
     private String mVideoUrl;
 
@@ -46,9 +49,11 @@ public class VideoPlayActivity extends BaseActivity {
 
     @Override
     public void initView() {
-        mCustomSurfaceView = (CustomSurfaceView) findViewById(R.id.surfaceView);
+        mCustomSurfaceView = findViewById(R.id.surfaceView);
         videoView = findViewById(R.id.video_view);
+        mVideoControlView = findViewById(R.id.video_control_view);
 
+        mCustomSurfaceView.setVideoControlView(mVideoControlView);
         mCustomSurfaceView.setIMediaPlayerListener(new IMediaPlayerListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
