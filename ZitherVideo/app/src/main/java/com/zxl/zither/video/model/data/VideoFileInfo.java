@@ -7,8 +7,12 @@ public class VideoFileInfo {
     public String mVideoId = "";
     @SerializedName("VideoName")
     public String mVideoName = "";
+    @SerializedName("VideoPath")
+    public String mVideoPath = "";
     @SerializedName("VideoDesc")
     public String mVideoDesc = "";
+    @SerializedName("ImgName")
+    public String mImgName = "";
     @SerializedName("UserId")
     public String mUserId = "";
     @SerializedName("ConvertVideo")
@@ -19,9 +23,11 @@ public class VideoFileInfo {
         return "VideoFileInfo{" +
                 "mVideoId='" + mVideoId + '\'' +
                 ", mVideoName='" + mVideoName + '\'' +
+                ", mVideoPath='" + mVideoPath + '\'' +
                 ", mVideoDesc='" + mVideoDesc + '\'' +
+                ", mImgName='" + mImgName + '\'' +
                 ", mUserId='" + mUserId + '\'' +
-                ", ConvertVideo='" + mConvertVideo + '\'' +
+                ", mConvertVideo='" + mConvertVideo + '\'' +
                 '}';
     }
 }

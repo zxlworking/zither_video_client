@@ -43,28 +43,27 @@ public class VideoControlView extends LinearLayout {
     private Runnable mLoopRunnable = new Runnable() {
         @Override
         public void run() {
-            mUIHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    if(mMediaPlayer == null){
-                        return;
-                    }
-                    synchronized (mLock){
-                        if(!isPlaying){
-                            return;
-                        }
-                        long currentTime = mMediaPlayer.getCurrentPosition();
-                        long totalTime = mMediaPlayer.getDuration();
-                        mSeekBar.setProgress((int) (currentTime * 100 / totalTime));
-                        mCurrentTimeTv.setText(formatTime(currentTime));
-                        mTotalTimeTv.setText(formatTime(totalTime));
-                    }
-                }
-            });
-            if(mMediaPlayer == null){
+            mUIHandler.post(mUILoopRunnable);
+            if(mMediaPlayer == null || !isPlaying){
                 return;
             }else{
                 mTaskHandler.postDelayed(this, 1000);
+            }
+        }
+    };
+
+    private Runnable mUILoopRunnable = new Runnable() {
+        @Override
+        public void run() {
+            synchronized (mLock){
+                if(mMediaPlayer == null || !isPlaying){
+                    return;
+                }
+                long currentTime = mMediaPlayer.getCurrentPosition();
+                long totalTime = mMediaPlayer.getDuration();
+                mSeekBar.setProgress((int) (currentTime * 100 / totalTime));
+                mCurrentTimeTv.setText(formatTime(currentTime));
+                mTotalTimeTv.setText(formatTime(totalTime));
             }
         }
     };
@@ -88,6 +87,7 @@ public class VideoControlView extends LinearLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         mMediaPlayer = null;
+        isPlaying(false);
         mTaskHandler.removeCallbacks(mLoopRunnable);
         mHandlerThread.quit();
     }
@@ -205,21 +205,24 @@ public class VideoControlView extends LinearLayout {
     }
 
     public void setPrepared(){
-        mTaskHandler.post(mLoopRunnable);
         isPlaying(true);
+        mTaskHandler.post(mLoopRunnable);
     }
 
     public void setComplete(){
-        mTaskHandler.removeCallbacks(mLoopRunnable);
         isPlaying(false);
+        mTaskHandler.removeCallbacks(mLoopRunnable);
     }
 
     public void setError(){
-        mTaskHandler.removeCallbacks(mLoopRunnable);
         isPlaying(false);
+        mTaskHandler.removeCallbacks(mLoopRunnable);
     }
 
     public void isPlaying(boolean b){
         isPlaying = b;
+        if(!isPlaying){
+            mUIHandler.removeCallbacks(mUILoopRunnable);
+        }
     }
 }

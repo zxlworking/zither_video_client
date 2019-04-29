@@ -126,10 +126,10 @@ public class CustomSurfaceView extends SurfaceView {
             @Override
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 DebugUtil.d(TAG,"onError");
-                closeMediaPlayer();
                 if(mVideoControlView != null){
                     mVideoControlView.setError();
                 }
+                closeMediaPlayer();
                 isPlaying = false;
                 return false;
             }
@@ -149,7 +149,6 @@ public class CustomSurfaceView extends SurfaceView {
             @Override
             public void surfaceDestroyed(SurfaceHolder holder) {
                 DebugUtil.d(TAG,"surfaceDestroyed");
-                closeMediaPlayer();
             }
         });
 
@@ -223,6 +222,9 @@ public class CustomSurfaceView extends SurfaceView {
     protected void onDetachedFromWindow() {
         DebugUtil.d(TAG,"onDetachedFromWindow");
         super.onDetachedFromWindow();
+        if(mVideoControlView != null){
+            mVideoControlView.isPlaying(false);
+        }
         closeMediaPlayer();
         HttpGetProxy.getInstance().stop();
     }
