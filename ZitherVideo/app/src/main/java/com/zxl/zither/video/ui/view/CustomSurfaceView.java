@@ -175,7 +175,7 @@ public class CustomSurfaceView extends SurfaceView {
             return;
         }
 
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(0, 0);
+        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(0, 0);
         int width;
         int height;
         if(mScreenOrientation == Configuration.ORIENTATION_PORTRAIT){

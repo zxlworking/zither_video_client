@@ -15,9 +15,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.zxl.common.DebugUtil;
 import com.zxl.zither.video.R;
 import com.zxl.zither.video.common.CommonUtils;
@@ -244,7 +246,10 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
-            viewHolder.mItemVideoListFileNameTv.setText(mVideoFileInfoList.get(i).mVideoName);
+            viewHolder.mItemVideoNameTv.setText(mVideoFileInfoList.get(i).mVideoName);
+            viewHolder.mItemVideoDescTv.setText("{\"status\":0,\"ver\":1552556805,\"name\":\"为你推荐\",\"language\":\"zh_CN\",\"encoding\":\"UTF-8\",\"data\":[{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15560228\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"深夜没在鼓楼买过醉 谁敢说懂北京？\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/gslb.miaopai.com\\/stream\\/-FWhgPqjln9AKfIZvDsmQJl-UH4dmT7r.mp4?source=xiaomi\"}},\"video_type\":0,\"create_time\":1491275979,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15560228\"},\"id\":\"15560228\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15560373\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"北京有一条文青小胡同 几平米就价值千万！\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/gslb.miaopai.com\\/stream\\/bhfBA3HAIwTUaOZwVw7Y7x-7Z4n0tLSc.mp4?source=xiaomi\"}},\"video_type\":0,\"create_time\":1497755407,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15560373\"},\"id\":\"15560373\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15560240\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"全北京最嗨的摇滚乐酒吧 来了就不想走\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/gslb.miaopai.com\\/stream\\/g09mfEgEzhk3loIY3us31D5jneZubiAJ.mp4?source=xiaomi\"}},\"video_type\":0,\"create_time\":1491358265,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15560240\"},\"id\":\"15560240\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15560331\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"这个说这一口北京腔的男生究竟是什么样的人呢\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/gslb.miaopai.com\\/stream\\/vue03NCEPJsV39in3u3-LUQ7kC51hCn8.mp4?source=xiaomi\"}},\"video_type\":0,\"create_time\":1493452497,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15560331\"},\"id\":\"15560331\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15560264\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"失败再站起 北京无腿老人用生命完成登珠峰\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/gslb.miaopai.com\\/stream\\/M-7j9hwnuYzInU663q6kZweStShGlFVn.mp4?source=xiaomi\"}},\"video_type\":0,\"create_time\":1494929132,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15560264\"},\"id\":\"15560264\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15560252\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"他带你体验老北京生活里的精品咖啡\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/gslb.miaopai.com\\/stream\\/ZlbEQ54nnHFyN-FOZOKri-s3pnyR~Lzx.mp4?source=xiaomi\"}},\"video_type\":0,\"create_time\":1491794933,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15560252\"},\"id\":\"15560252\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15560327\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"老北京影像 很多人无法回去的故乡\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/gslb.miaopai.com\\/stream\\/fkj0DIC4HTJMnezQl4efWxkkEqUKWg0G.mp4?source=xiaomi\"}},\"video_type\":0,\"create_time\":1489891789,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15560327\"},\"id\":\"15560327\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15554804\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"北京五大情侣好去处\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/kuai.xl.ptxl.gitv.tv\\/22\\/E1\\/22E1975730D06341D2FA79010686B8AA.mp4?timestamp=1552529149&sign=d2a6206fdc98decae000bd8afbdc5e30\"},\"signkey\":\"8FgcV3FQ1rQ1\",\"expire_time\":1552572349},\"video_type\":0,\"create_time\":1505298620,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15554804\"},\"id\":\"15554804\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15596861\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"点亮北京足迹，领略古都风采 ：这里的破房子值上亿\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/kuai.xl.ptxl.gitv.tv\\/73\\/92\\/7392B72209895DEA49451576DF3B14F9.mp4?timestamp=1552529398&sign=bf90b75a683c61ac2a2fa6cc8531cf27\"},\"signkey\":\"8FgcV3FQ1rQ1\",\"expire_time\":1552572598},\"video_type\":0,\"create_time\":1526462733,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15596861\"},\"id\":\"15596861\"},{\"category\":86,\"stat\":{\"trace\":\"\",\"id\":\"15618873\",\"tp\":\"headline\"},\"subtitle\":\"\",\"title\":\"民宿大评测之广州北京路三层独栋小洋房\",\"play_url\":{\"media\":{\"source\":20000,\"playurl\":\"http:\\/\\/kuai.xl.ptxl.gitv.tv\\/0E\\/8F\\/0E8F9155B61B2D7CA4C60374C72DC20F.mp4?timestamp=1552529536&sign=a4ae4827a00c1589ff78de6205e1f841\"},\"signkey\":\"8FgcV3FQ1rQ1\",\"expire_time\":1552572736},\"video_type\":0,\"create_time\":1539324702,\"rec\":{\"url\":\"\\/tv\\/headline\\/v\\/rec?id=15618873\"},\"id\":\"15618873\"}]}");
+            ///storage/emulated/0/DCIM/Screenshots/Screenshot_2019-04-26-18-51-50-412_com.sdu.didi.psnger.png
+            Glide.with(mActivity).load("/storage/emulated/0/DCIM/Screenshots/Screenshot_2019-04-26-18-51-50-412_com.sdu.didi.psnger.png").into(viewHolder.mItemVideoImg);
 
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -254,6 +259,7 @@ public class MainActivity extends BaseActivity {
                     startActivity(intent);
                 }
             });
+
         }
 
         @Override
@@ -265,12 +271,16 @@ public class MainActivity extends BaseActivity {
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
-        public TextView mItemVideoListFileNameTv;
+        public TextView mItemVideoNameTv;
+        public TextView mItemVideoDescTv;
+        public ImageView mItemVideoImg;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            mItemVideoListFileNameTv = itemView.findViewById(R.id.item_video_list_file_name_tv);
+            mItemVideoNameTv = itemView.findViewById(R.id.item_video_name_tv);
+            mItemVideoDescTv = itemView.findViewById(R.id.item_video_desc_tv);
+            mItemVideoImg = itemView.findViewById(R.id.item_video_img);
         }
     }
 }

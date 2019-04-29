@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.zxl.common.DebugUtil;
 import com.zxl.zither.video.R;
 import com.zxl.zither.video.common.CommonUtils;
@@ -47,6 +48,7 @@ public class UpLoadVideoFileActivity extends BaseActivity {
     private View mUploadVideoFileView;
     private TextView mUploadProgressTv;
     private ImageView mVideoImg;
+    private TextView mChooseVideoImgTv;
 
     private DecimalFormat mDecimalFormat = new DecimalFormat("#.##");
 
@@ -107,6 +109,7 @@ public class UpLoadVideoFileActivity extends BaseActivity {
         mUploadVideoFileView = findViewById(R.id.upload_video_file_view);
         mUploadProgressTv = findViewById(R.id.upload_progress_tv);
         mVideoImg = findViewById(R.id.video_img);
+        mChooseVideoImgTv = findViewById(R.id.choose_video_img_tv);
 
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
@@ -218,6 +221,10 @@ public class UpLoadVideoFileActivity extends BaseActivity {
                         String mGalleryPath = CommonUtils.parseGalleryPath(mActivity,data.getData());
                         DebugUtil.d(TAG,"onActivityResult::GALLERY_OPEN_REQUEST_CODE::mGalleryPath = " + mGalleryPath);
                         mUploadVideoImgFilePath = mGalleryPath;
+
+                        mChooseVideoImgTv.setVisibility(View.GONE);
+
+                        Glide.with(mActivity).load(mUploadVideoImgFilePath).into(mVideoImg);
                     }
                     break;
             }
