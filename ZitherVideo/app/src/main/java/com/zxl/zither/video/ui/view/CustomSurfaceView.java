@@ -168,7 +168,7 @@ public class CustomSurfaceView extends SurfaceView {
     private void resetViewSize(MediaPlayer mp) {
         int videoWidth = mp.getVideoWidth();
         int videoHeight = mp.getVideoHeight();
-        DebugUtil.d(TAG,"onVideoSizeChanged::videoWidth = " + videoWidth + "::videoHeight = " + videoHeight);
+        DebugUtil.d(TAG,"resetViewSize::videoWidth = " + videoWidth + "::videoHeight = " + videoHeight);
 
         if(videoWidth == 0 || videoHeight == 0){
             return;
@@ -184,7 +184,7 @@ public class CustomSurfaceView extends SurfaceView {
             height = mContext.getResources().getDisplayMetrics().heightPixels;
             width = videoWidth * height / videoHeight;
         }
-        DebugUtil.d(TAG,"onVideoSizeChanged::width = " + width + "::height = " + height);
+        DebugUtil.d(TAG,"resetViewSize::width = " + width + "::height = " + height);
 
         layoutParams.width = width;
         layoutParams.height = height;
@@ -202,8 +202,13 @@ public class CustomSurfaceView extends SurfaceView {
     }
 
     public void setDataSource(String videoUrl){
-        if(TextUtils.isEmpty(videoUrl)){
+        DebugUtil.d(TAG,"setDataSource::videoUrl = " + videoUrl + "::mediaplayer = " + mMediaPlayer);
+        if(TextUtils.isEmpty(videoUrl) || mMediaPlayer == null){
             return;
+        }
+
+        if(mVideoControlView != null){
+            mVideoControlView.isPlaying(false);
         }
 
         mMediaPlayer.reset();
@@ -219,6 +224,7 @@ public class CustomSurfaceView extends SurfaceView {
     }
 
     public void start(){
+        DebugUtil.d(TAG,"start()");
         mMediaPlayer.start();
     }
 
@@ -241,6 +247,7 @@ public class CustomSurfaceView extends SurfaceView {
     }
 
     private void closeMediaPlayer(){
+        DebugUtil.d(TAG,"closeMediaPlayer");
         setKeepScreenOn(false);
         if (mMediaPlayer != null) {
             mMediaPlayer.reset();

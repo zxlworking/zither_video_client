@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.zxl.common.DebugUtil;
 import com.zxl.zither.video.R;
 
 import java.text.DecimalFormat;
@@ -43,6 +44,7 @@ public class VideoControlView extends LinearLayout {
     private Runnable mLoopRunnable = new Runnable() {
         @Override
         public void run() {
+            DebugUtil.d(TAG,"mLoopRunnable");
             mUIHandler.post(mUILoopRunnable);
             if(mMediaPlayer == null || !isPlaying){
                 return;
@@ -55,6 +57,7 @@ public class VideoControlView extends LinearLayout {
     private Runnable mUILoopRunnable = new Runnable() {
         @Override
         public void run() {
+            DebugUtil.d(TAG,"mUILoopRunnable");
             synchronized (mLock){
                 if(mMediaPlayer == null || !isPlaying){
                     return;

@@ -188,6 +188,7 @@ public class VideoPlayActivity extends BaseActivity {
                 break;
         }
 
+        DebugUtil.d(TAG,"playVideo::playUrl = " + playUrl);
         DebugUtil.d(TAG,"playVideo::mVideoUrl = " + mVideoUrl);
 
         if(!TextUtils.isEmpty(playUrl)){
