@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputEditText;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
@@ -20,9 +19,7 @@ import com.zxl.zither.video.http.FileRequestBody;
 import com.zxl.zither.video.http.HttpUtils;
 import com.zxl.zither.video.http.RetrofitCallback;
 import com.zxl.zither.video.http.listener.NetRequestListener;
-import com.zxl.zither.video.model.data.FileInfo;
 import com.zxl.zither.video.model.response.ResponseBaseBean;
-import com.zxl.zither.video.utils.Constants;
 import com.zxl.zither.video.utils.SharePreUtils;
 
 import java.io.File;
@@ -39,20 +36,26 @@ import retrofit2.Response;
 public class UpLoadVideoFileActivity extends BaseActivity {
     private static final String TAG = "UpLoadVideoFileActivity";
 
-    private static final int OPEN_GALLERY_REQUEST_CODE = 1;
+    private static final int OPEN_VIDEO_REQUEST_CODE = 1;
+    private static final int OPEN_STUDENT_VIDEO_REQUEST_CODE = 2;
+    private static final int OPEN_GALLERY_REQUEST_CODE = 3;
 
     public static final String UPLOAD_VIDEO_FILE_PATH_EXTRA = "VIDEO_PLAY_EXTRA";
 
-    private EditText mVideoNameInputEt;
+    private EditText mVideoNameEt;
+    private EditText mStudentVideoNameEt;
     private EditText mVideoDescInputEt;
     private View mUploadVideoFileView;
     private TextView mUploadProgressTv;
     private ImageView mVideoImg;
+    private TextView mChooseStudentVideoTv;
+    private TextView mChooseVideoTv;
     private TextView mChooseVideoImgTv;
 
     private DecimalFormat mDecimalFormat = new DecimalFormat("#.##");
 
     private String mUploadVideoFilePath;
+    private String mUploadStudentVideoFilePath;
     private String mUploadVideoImgFilePath;
 
     private RetrofitCallback mRetrofitCallback = new RetrofitCallback() {
@@ -104,11 +107,14 @@ public class UpLoadVideoFileActivity extends BaseActivity {
 
     @Override
     public void initView() {
-        mVideoNameInputEt = findViewById(R.id.video_name_input_et);
+        mVideoNameEt = findViewById(R.id.video_name_et);
+        mStudentVideoNameEt = findViewById(R.id.student_video_name_et);
         mVideoDescInputEt = findViewById(R.id.video_desc_input_et);
         mUploadVideoFileView = findViewById(R.id.upload_video_file_view);
         mUploadProgressTv = findViewById(R.id.upload_progress_tv);
         mVideoImg = findViewById(R.id.video_img);
+        mChooseVideoTv = findViewById(R.id.choose_video_tv);
+        mChooseStudentVideoTv = findViewById(R.id.choose_student_video_tv);
         mChooseVideoImgTv = findViewById(R.id.choose_video_img_tv);
 
         Bundle bundle = getIntent().getExtras();
@@ -117,10 +123,26 @@ public class UpLoadVideoFileActivity extends BaseActivity {
             DebugUtil.d(TAG,"initView::mUploadVideoFilePath = " + mUploadVideoFilePath);
 
             File uploadVideoFile = new File(mUploadVideoFilePath);
-            mVideoNameInputEt.setText(uploadVideoFile.getName());
+            mVideoNameEt.setText(uploadVideoFile.getName());
 
         }
 
+        mChooseVideoTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mOpenGalleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                mOpenGalleryIntent.setType("video/*");
+                startActivityForResult(mOpenGalleryIntent,OPEN_VIDEO_REQUEST_CODE);
+            }
+        });
+        mChooseStudentVideoTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent mOpenGalleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                mOpenGalleryIntent.setType("video/*");
+                startActivityForResult(mOpenGalleryIntent,OPEN_STUDENT_VIDEO_REQUEST_CODE);
+            }
+        });
         mVideoImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,11 +155,11 @@ public class UpLoadVideoFileActivity extends BaseActivity {
         mUploadVideoFileView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(TextUtils.isEmpty(mVideoNameInputEt.getText().toString())){
-                    Toast.makeText(mActivity,"文件名不能为空",Toast.LENGTH_SHORT).show();
+                if(TextUtils.isEmpty(mVideoNameEt.getText()) || TextUtils.isEmpty(mUploadStudentVideoFilePath)){
+                    Toast.makeText(mActivity,"视频文件不能为空",Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(TextUtils.isEmpty(mVideoDescInputEt.getText().toString())){
+                if(TextUtils.isEmpty(mStudentVideoNameEt.getText().toString())){
                     Toast.makeText(mActivity,"描述不能为空",Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -147,6 +169,7 @@ public class UpLoadVideoFileActivity extends BaseActivity {
                 }
 
                 File uploadVideoFile = new File(mUploadVideoFilePath);
+                File uploadStudentVideoFile = new File(mUploadStudentVideoFilePath);
                 File uploadVideoImgFile = new File(mUploadVideoImgFilePath);
 
 //                MultipartBody.Builder builder = new MultipartBody.Builder();
@@ -159,22 +182,27 @@ public class UpLoadVideoFileActivity extends BaseActivity {
 //                FileRequestBody fileRequestBody = new FileRequestBody(multipartBody,mRetrofitCallback);
 
 
-                RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), uploadVideoFile);
-                RequestBody requestBody2 = RequestBody.create(MediaType.parse("multipart/form-data"), uploadVideoImgFile);
+                RequestBody videoRequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), uploadVideoFile);
+                RequestBody studentVideoRequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), uploadStudentVideoFile);
+                RequestBody imgRequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), uploadVideoImgFile);
 //                HashMap<String, RequestBody> map = new HashMap<>();
 //                map.put(uploadVideoFile.getName(), requestBody);
 //                map.put(uploadVideoImgFile.getName(), requestBody2);
 
                 MultipartBody.Builder builder = new MultipartBody.Builder();
-                builder.addFormDataPart("value", uploadVideoFile.getName(), requestBody);
-                builder.addFormDataPart("value", uploadVideoImgFile.getName(), requestBody2);
+                builder.addFormDataPart("value", uploadVideoFile.getName(), videoRequestBody);
+                builder.addFormDataPart("value", uploadStudentVideoFile.getName(), studentVideoRequestBody);
+                builder.addFormDataPart("value", uploadVideoImgFile.getName(), imgRequestBody);
                 builder.setType(MultipartBody.FORM);
                 MultipartBody multipartBody = builder.build();
                 FileRequestBody fileRequestBody = new FileRequestBody(multipartBody,mRetrofitCallback);
 
 
                 Map<String,String> params = new HashMap<>();
-                params.put("video_name", mVideoNameInputEt.getText().toString());
+                params.put("video_name", mVideoNameEt.getText().toString());
+                params.put("video_real_name", uploadVideoFile.getName());
+                params.put("student_video_name", mStudentVideoNameEt.getText().toString());
+                params.put("student_video_real_name", uploadStudentVideoFile.getName());
                 params.put("video_desc", mVideoDescInputEt.getText().toString());
                 params.put("user_id", SharePreUtils.getInstance(mActivity).getUserInfo().mUserId);
 
@@ -213,6 +241,34 @@ public class UpLoadVideoFileActivity extends BaseActivity {
 
         if(resultCode == RESULT_OK){
             switch (requestCode){
+                case OPEN_VIDEO_REQUEST_CODE:
+                    if(data == null){
+                        DebugUtil.d(TAG,"onActivityResult::OPEN_VIDEO_REQUEST_CODE::data null");
+                    }else{
+                        DebugUtil.d(TAG,"onActivityResult::OPEN_VIDEO_REQUEST_CODE::data = " + data.getData());
+                        String mGalleryPath = CommonUtils.parseGalleryPath(mActivity,data.getData());
+                        DebugUtil.d(TAG,"onActivityResult::OPEN_VIDEO_REQUEST_CODE::mGalleryPath = " + mGalleryPath);
+                        mUploadVideoFilePath = mGalleryPath;
+                        File file = new File(mUploadVideoFilePath);
+                        mChooseVideoTv.setVisibility(View.GONE);
+                        mVideoNameEt.setVisibility(View.VISIBLE);
+                        mVideoNameEt.setText(file.getName());
+                    }
+                    break;
+                case OPEN_STUDENT_VIDEO_REQUEST_CODE:
+                    if(data == null){
+                        DebugUtil.d(TAG,"onActivityResult::OPEN_STUDENT_VIDEO_REQUEST_CODE::data null");
+                    }else{
+                        DebugUtil.d(TAG,"onActivityResult::OPEN_STUDENT_VIDEO_REQUEST_CODE::data = " + data.getData());
+                        String mGalleryPath = CommonUtils.parseGalleryPath(mActivity,data.getData());
+                        DebugUtil.d(TAG,"onActivityResult::OPEN_STUDENT_VIDEO_REQUEST_CODE::mGalleryPath = " + mGalleryPath);
+                        mUploadStudentVideoFilePath = mGalleryPath;
+                        File file = new File(mUploadStudentVideoFilePath);
+                        mChooseStudentVideoTv.setVisibility(View.GONE);
+                        mStudentVideoNameEt.setVisibility(View.VISIBLE);
+                        mStudentVideoNameEt.setText(file.getName());
+                    }
+                    break;
                 case OPEN_GALLERY_REQUEST_CODE:
                     if(data == null){
                         DebugUtil.d(TAG,"onActivityResult::GALLERY_OPEN_REQUEST_CODE::data null");

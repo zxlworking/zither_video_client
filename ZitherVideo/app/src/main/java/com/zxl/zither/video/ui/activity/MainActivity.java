@@ -15,6 +15,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,8 +58,7 @@ import static com.zxl.zither.video.ui.activity.VideoPlayActivity.VIDEO_PLAY_EXTR
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
 
-    private static final int OPEN_GALLERY_REQUEST_CODE = 1;
-    private static final int UP_LOAD_VIDO_FILE_REQUEST_CODE = 2;
+    private static final int UP_LOAD_VIDO_FILE_REQUEST_CODE = 1;
 
     private boolean isLoading = false;
 
@@ -68,6 +69,10 @@ public class MainActivity extends BaseActivity {
     private VideoListAdapter mVideoListAdapter;
 
     private Menu mMenu;
+
+    private boolean isDelete = false;
+
+    private List<String> mDeleteVideoIds = new ArrayList<>();
 
     @Override
     public int getResLayout() {
@@ -114,7 +119,10 @@ public class MainActivity extends BaseActivity {
         UserInfo userInfo = SharePreUtils.getInstance(this).getUserInfo();
         if(userInfo != null && userInfo.mUserType == Constants.USER_TYPE_NORMAL){
             menu.removeItem(R.id.menu_upload_video_file);
+            menu.removeItem(R.id.menu_delete_video_file);
         }
+        menu.removeItem(R.id.menu_delete_confirm);
+        menu.removeItem(R.id.menu_delete_cancel);
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -123,9 +131,56 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.menu_upload_video_file:
-                Intent mOpenGalleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-                mOpenGalleryIntent.setType("video/*");
-                startActivityForResult(mOpenGalleryIntent,OPEN_GALLERY_REQUEST_CODE);
+                Intent intent = new Intent(mActivity, UpLoadVideoFileActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.menu_delete_video_file:
+                mMenu.removeItem(R.id.menu_upload_video_file);
+                mMenu.removeItem(R.id.menu_delete_video_file);
+                mMenu.removeItem(R.id.menu_logout);
+
+                mMenu.add(0,R.id.menu_delete_confirm,0,"确定删除");
+                mMenu.add(0,R.id.menu_delete_cancel,0,"取消删除");
+
+                isDelete = true;
+                mDeleteVideoIds.clear();
+                mVideoListAdapter.notifyDataSetChanged();
+                break;
+            case R.id.menu_delete_confirm:
+                UserInfo userInfo = SharePreUtils.getInstance(this).getUserInfo();
+                if(userInfo != null && userInfo.mUserType == Constants.USER_TYPE_NORMAL){
+                    mMenu.removeItem(R.id.menu_upload_video_file);
+                    mMenu.removeItem(R.id.menu_delete_video_file);
+                }else{
+                    mMenu.add(0,R.id.menu_upload_video_file,0,"上传视频文件");
+                    mMenu.add(0,R.id.menu_delete_video_file,0,"删除视频文件");
+                }
+                mMenu.add(0,R.id.menu_logout,0,"注销");
+
+                mMenu.removeItem(R.id.menu_delete_confirm);
+                mMenu.removeItem(R.id.menu_delete_cancel);
+
+                isDelete = false;
+                mVideoListAdapter.notifyDataSetChanged();
+
+                deleteVideoIds();
+                break;
+            case R.id.menu_delete_cancel:
+                userInfo = SharePreUtils.getInstance(this).getUserInfo();
+                if(userInfo != null && userInfo.mUserType == Constants.USER_TYPE_NORMAL){
+                    mMenu.removeItem(R.id.menu_upload_video_file);
+                    mMenu.removeItem(R.id.menu_delete_video_file);
+                }else{
+                    mMenu.add(0,R.id.menu_upload_video_file,0,"上传视频文件");
+                    mMenu.add(0,R.id.menu_delete_video_file,0,"删除视频文件");
+                }
+                mMenu.add(0,R.id.menu_logout,0,"注销");
+
+                mMenu.removeItem(R.id.menu_delete_confirm);
+                mMenu.removeItem(R.id.menu_delete_cancel);
+
+                isDelete = false;
+                mVideoListAdapter.notifyDataSetChanged();
                 break;
             case R.id.menu_logout:
                 SharePreUtils.getInstance(mActivity).saveUserInfo(null);
@@ -139,24 +194,12 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        //super.onActivityResult(requestCode, resultCode, data);
         DebugUtil.d(TAG,"onActivityResult::requestCode = " + requestCode);
         DebugUtil.d(TAG,"onActivityResult::resultCode = " + resultCode);
 
         if(resultCode == RESULT_OK){
             switch (requestCode){
-                case OPEN_GALLERY_REQUEST_CODE:
-                    if(data == null){
-                        DebugUtil.d(TAG,"onActivityResult::GALLERY_OPEN_REQUEST_CODE::data null");
-                    }else{
-                        DebugUtil.d(TAG,"onActivityResult::GALLERY_OPEN_REQUEST_CODE::data = " + data.getData());
-                        String mGalleryPath = CommonUtils.parseGalleryPath(mActivity,data.getData());
-                        DebugUtil.d(TAG,"onActivityResult::GALLERY_OPEN_REQUEST_CODE::mGalleryPath = " + mGalleryPath);
-                        Intent intent = new Intent(mActivity, UpLoadVideoFileActivity.class);
-                        intent.putExtra(UpLoadVideoFileActivity.UPLOAD_VIDEO_FILE_PATH_EXTRA, mGalleryPath);
-                        startActivityForResult(intent, UP_LOAD_VIDO_FILE_REQUEST_CODE);
-                    }
-                    break;
                 case UP_LOAD_VIDO_FILE_REQUEST_CODE:
                     getData();
                     break;
@@ -221,6 +264,53 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    private void deleteVideoIds(){
+        DebugUtil.d(TAG,"deleteVideoIds");
+        if(isLoading || mDeleteVideoIds.isEmpty()){
+            return;
+        }
+        isLoading = true;
+
+        showLoading();
+        mRecyclerView.setVisibility(View.GONE);
+        HttpUtils.getInstance().deleteVideoFileList(mActivity, mDeleteVideoIds, new NetRequestListener() {
+            @Override
+            public void onSuccess(ResponseBaseBean responseBaseBean) {
+
+                hideLoading(false);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                isLoading = false;
+                mSwipeRefreshLayout.setRefreshing(false);
+
+                getData();
+            }
+
+            @Override
+            public void onNetError() {
+                Toast.makeText(mActivity,String.format(mActivity.getResources().getString(R.string.no_network_tip)),Toast.LENGTH_SHORT).show();
+                hideLoading(true);
+                isLoading = false;
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onNetError(Throwable e) {
+                Toast.makeText(mActivity,String.format(mActivity.getResources().getString(R.string.network_error_tip)," 请检查网络"),Toast.LENGTH_SHORT).show();
+                hideLoading(true);
+                isLoading = false;
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onServerError(ResponseBaseBean responseBaseBean) {
+                Toast.makeText(mActivity,String.format(mActivity.getResources().getString(R.string.server_error_tip),responseBaseBean.desc),Toast.LENGTH_SHORT).show();
+                hideLoading(true);
+                isLoading = false;
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
     class VideoListAdapter extends RecyclerView.Adapter<ViewHolder>{
 
         private List<VideoFileInfo> mVideoFileInfoList = new ArrayList<>();
@@ -251,6 +341,17 @@ public class MainActivity extends BaseActivity {
             ///storage/emulated/0/DCIM/Screenshots/Screenshot_2019-04-26-18-51-50-412_com.sdu.didi.psnger.png
             Glide.with(mActivity).load(Constants.BASE_IMG_URL + mVideoFileInfoList.get(i).mImgName).into(viewHolder.mItemVideoImg);
 
+            if(isDelete){
+                viewHolder.mCheckBox.setVisibility(View.VISIBLE);
+                if(mVideoFileInfoList.contains(mVideoFileInfoList.get(i).mVideoId)){
+                    viewHolder.mCheckBox.setChecked(true);
+                }else{
+                    viewHolder.mCheckBox.setChecked(false);
+                }
+            }else{
+                viewHolder.mCheckBox.setVisibility(View.GONE);
+            }
+
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -260,12 +361,23 @@ public class MainActivity extends BaseActivity {
                 }
             });
 
+            viewHolder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    DebugUtil.d(TAG,"onCheckedChanged::videoId = " + mVideoFileInfoList.get(i).mVideoId);
+                    if(isChecked){
+                        mDeleteVideoIds.add(mVideoFileInfoList.get(i).mVideoId);
+                    }else{
+                        mDeleteVideoIds.remove(mVideoFileInfoList.get(i).mVideoId);
+                    }
+                }
+            });
+
         }
 
         @Override
         public int getItemCount() {
             int size = mVideoFileInfoList.size();
-            DebugUtil.d(TAG,"getItemCount::size = " + size);
             return size;
         }
     }
@@ -274,6 +386,7 @@ public class MainActivity extends BaseActivity {
         public TextView mItemVideoNameTv;
         public TextView mItemVideoDescTv;
         public ImageView mItemVideoImg;
+        public CheckBox mCheckBox;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -281,6 +394,7 @@ public class MainActivity extends BaseActivity {
             mItemVideoNameTv = itemView.findViewById(R.id.item_video_name_tv);
             mItemVideoDescTv = itemView.findViewById(R.id.item_video_desc_tv);
             mItemVideoImg = itemView.findViewById(R.id.item_video_img);
+            mCheckBox = itemView.findViewById(R.id.check_box);
         }
     }
 }

@@ -18,6 +18,12 @@
         android:padding="12dp"
         android:orientation="vertical">
 
+        <CheckBox
+            android:id="@+id/check_box"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="right"/>
+
         <TextView
             android:id="@+id/item_video_name_tv"
             android:layout_width="wrap_content"

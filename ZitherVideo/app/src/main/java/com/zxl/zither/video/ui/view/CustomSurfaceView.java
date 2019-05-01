@@ -98,20 +98,20 @@ public class CustomSurfaceView extends SurfaceView {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 DebugUtil.d(TAG,"onCompletion");
-                if(mIMediaPlayerListener != null){
-                    mIMediaPlayerListener.onCompletion(mp);
-                }
                 mp.setScreenOnWhilePlaying(false);
                 if(mVideoControlView != null){
                     mVideoControlView.setComplete();
                 }
                 isPlaying = false;
-
-                mp.start();
-                if(mVideoControlView != null){
-                    mVideoControlView.setPrepared();
+                if(mIMediaPlayerListener != null){
+                    mIMediaPlayerListener.onCompletion(mp);
                 }
-                isPlaying = true;
+
+//                mp.start();
+//                if(mVideoControlView != null){
+//                    mVideoControlView.setPrepared();
+//                }
+//                isPlaying = true;
 
             }
         });
@@ -209,13 +209,17 @@ public class CustomSurfaceView extends SurfaceView {
         mMediaPlayer.reset();
 
         try {
-            String localUrl = HttpGetProxy.getInstance().getLocalURL(videoUrl);
-            DebugUtil.d(TAG,"setDataSource::localUrl = " + localUrl);
-            mMediaPlayer.setDataSource(localUrl);
+            //String localUrl = HttpGetProxy.getInstance().getLocalURL(videoUrl);
+            //DebugUtil.d(TAG,"setDataSource::localUrl = " + localUrl);
+            mMediaPlayer.setDataSource(videoUrl);
             mMediaPlayer.prepareAsync();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void start(){
+        mMediaPlayer.start();
     }
 
     @Override

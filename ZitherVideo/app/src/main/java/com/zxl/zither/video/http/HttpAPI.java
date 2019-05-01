@@ -6,6 +6,7 @@ import com.zxl.zither.video.model.response.ResponseBaseBean;
 import com.zxl.zither.video.model.response.VideoFileInfoResponse;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.RequestBody;
@@ -32,6 +33,9 @@ public interface HttpAPI {
 
     @GET("get_video_file_list")
     public Observable<VideoFileInfoResponse> getVideoFileList();
+
+    @GET("delete_video_file")
+    public Observable<ResponseBaseBean> deleteVideoFileList(@Query("video_id")List<String> videoIds);
 
 //    @Multipart
     @POST("upload_video_file")

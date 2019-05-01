@@ -16,6 +16,7 @@ import com.zxl.zither.video.utils.Constants;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -217,6 +218,49 @@ public class HttpUtils {
                     });
         }else{
             DebugUtil.d(TAG,"getVideoFileList::net work error");
+            if(listener != null){
+                listener.onNetError();
+            }
+        }
+    }
+
+    public void deleteVideoFileList(Context context, List<String> videoIds, final NetRequestListener listener){
+        DebugUtil.d(TAG,"deleteVideoFileList::videoIds = " + videoIds);
+
+        if(isNetworkAvailable(context)){
+            Observable<ResponseBaseBean> observable = mHttpAPI.deleteVideoFileList(videoIds);
+            observable.subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<ResponseBaseBean>() {
+                        @Override
+                        public void onCompleted() {
+                            DebugUtil.d(TAG,"deleteVideoFileList::onCompleted");
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            DebugUtil.d(TAG,"deleteVideoFileList::onError::e = " + e);
+                            if(listener != null){
+                                listener.onNetError(e);
+                            }
+                        }
+
+                        @Override
+                        public void onNext(ResponseBaseBean responseBaseBean) {
+                            DebugUtil.d(TAG,"deleteVideoFileList::onNext::responseBaseBean = " + responseBaseBean);
+                            if(responseBaseBean.code == 0){
+                                if(listener != null){
+                                    listener.onSuccess(responseBaseBean);
+                                }
+                            }else{
+                                if(listener != null){
+                                    listener.onServerError(responseBaseBean);
+                                }
+                            }
+                        }
+                    });
+        }else{
+            DebugUtil.d(TAG,"deleteVideoFileList::net work error");
             if(listener != null){
                 listener.onNetError();
             }

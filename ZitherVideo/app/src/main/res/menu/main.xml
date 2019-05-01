@@ -9,6 +9,21 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
 
+    <item android:id="@+id/menu_delete_video_file"
+        android:title="删除视频文件"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menu_delete_confirm"
+        android:title="确定删除"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/menu_delete_cancel"
+        android:title="取消删除"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
     <item android:id="@+id/menu_logout"
         android:title="注销"
         android:orderInCategory="100"

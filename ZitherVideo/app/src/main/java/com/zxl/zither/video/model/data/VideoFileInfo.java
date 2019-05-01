@@ -9,6 +9,10 @@ public class VideoFileInfo {
     public String mVideoName = "";
     @SerializedName("VideoPath")
     public String mVideoPath = "";
+    @SerializedName("StudentVideoName")
+    public String mStudentVideoName = "";
+    @SerializedName("StudentVideoPath")
+    public String mStudentVideoPath = "";
     @SerializedName("VideoDesc")
     public String mVideoDesc = "";
     @SerializedName("ImgName")
@@ -24,6 +28,8 @@ public class VideoFileInfo {
                 "mVideoId='" + mVideoId + '\'' +
                 ", mVideoName='" + mVideoName + '\'' +
                 ", mVideoPath='" + mVideoPath + '\'' +
+                ", mStudentVideoName='" + mStudentVideoName + '\'' +
+                ", mStudentVideoPath='" + mStudentVideoPath + '\'' +
                 ", mVideoDesc='" + mVideoDesc + '\'' +
                 ", mImgName='" + mImgName + '\'' +
                 ", mUserId='" + mUserId + '\'' +
