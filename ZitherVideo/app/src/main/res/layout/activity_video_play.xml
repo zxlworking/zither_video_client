@@ -43,6 +43,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/video_ori_img"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:scaleType="fitCenter" />
         </FrameLayout>
 
         <com.zxl.zither.video.ui.view.VideoControlView

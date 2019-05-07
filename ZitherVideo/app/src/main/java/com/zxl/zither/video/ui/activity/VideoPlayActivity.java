@@ -47,6 +47,7 @@ public class VideoPlayActivity extends BaseActivity {
     private TextView mVideoNameTv;
     private TextView mVideoDescTv;
     private ImageView mVideoImg;
+    private ImageView mVideoOriImg;
 
     private Button mPlayVideoBtn;
     private Button mPlayStudentVideoBtn;
@@ -80,6 +81,7 @@ public class VideoPlayActivity extends BaseActivity {
         mVideoNameTv = findViewById(R.id.video_name_tv);
         mVideoDescTv = findViewById(R.id.video_desc_tv);
         mVideoImg = findViewById(R.id.video_img);
+        mVideoOriImg = findViewById(R.id.video_ori_img);
 
         mPlayVideoBtn = findViewById(R.id.play_video_btn);
         mPlayStudentVideoBtn = findViewById(R.id.play_student_video_btn);
@@ -218,9 +220,12 @@ public class VideoPlayActivity extends BaseActivity {
         super.onConfigurationChanged(newConfig);
         DebugUtil.d(TAG,"onConfigurationChanged::newConfig = " + newConfig.orientation + "::ORIENTATION_PORTRAIT = " + Configuration.ORIENTATION_PORTRAIT + "::ORIENTATION_LANDSCAPE = " + Configuration.ORIENTATION_LANDSCAPE);
         if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT){
+            mVideoOriImg.setVisibility(View.GONE);
             mViewContentScrollView.setVisibility(View.VISIBLE);
         }else{
             mViewContentScrollView.setVisibility(View.GONE);
+            mVideoOriImg.setVisibility(View.VISIBLE);
+            Glide.with(mActivity).load(Constants.BASE_IMG_URL + mVideoFileInfo.mImgName).into(mVideoOriImg);
         }
     }
 
