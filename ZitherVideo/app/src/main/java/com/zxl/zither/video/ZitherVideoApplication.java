@@ -15,7 +15,7 @@ public class ZitherVideoApplication extends Application {
         DebugUtil.IS_DEBUG = DebugUtil.STATE_OPEN;
         EventBusUtils.init();
 
-        GlobalCrashHandler.getInstance(this);
+        //GlobalCrashHandler.getInstance(this);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);//低版本支持全屏的矢量图标
     }
 }

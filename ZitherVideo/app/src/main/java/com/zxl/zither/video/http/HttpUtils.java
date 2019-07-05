@@ -8,6 +8,7 @@ import com.zxl.common.DebugUtil;
 import com.zxl.zither.video.common.CommonUtils;
 import com.zxl.zither.video.http.listener.NetRequestListener;
 import com.zxl.zither.video.model.data.UserInfo;
+import com.zxl.zither.video.model.response.EvaluateSelfResponseBean;
 import com.zxl.zither.video.model.response.FileInfoResponse;
 import com.zxl.zither.video.model.response.LoginResponseBean;
 import com.zxl.zither.video.model.response.ResponseBaseBean;
@@ -310,6 +311,64 @@ public class HttpUtils {
                         DebugUtil.d(TAG,"uploadVideoFile::onNext::responseBaseBean = " + responseBaseBean);
                         if(responseBaseBean.code == 0){
                             if(listener != null){
+                                listener.onSuccess(responseBaseBean);
+                            }
+                        }else{
+                            if(listener != null){
+                                listener.onServerError(responseBaseBean);
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void uploadStrImgFile(Map<String,String> params, FileRequestBody fileRequestBody, final NetRequestListener listener){
+        DebugUtil.d(TAG,"uploadStrImgFile::params = " + params);
+
+//        Call<ResponseBody> call = mHttpAPI.uploadStarImgFile(params, fileRequestBody);
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                try {
+//                    String s = new String(response.body().bytes());
+//                    DebugUtil.d(TAG, "uploadStrImgFile::s = " + s);
+//                    EvaluateSelfResponseBean bean = CommonUtils.mGson.fromJson(s, EvaluateSelfResponseBean.class);
+//                    DebugUtil.d(TAG, "uploadStrImgFile::bean = " + bean);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//
+//            }
+//        });
+
+        Observable<EvaluateSelfResponseBean> observable = mHttpAPI.uploadStarImgFile(params, fileRequestBody);
+        observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<EvaluateSelfResponseBean>() {
+                    @Override
+                    public void onCompleted() {
+                        DebugUtil.d(TAG,"uploadStrImgFile::onCompleted");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        DebugUtil.d(TAG,"uploadStrImgFile::onError::e = " + e);
+                        if(listener != null){
+                            listener.onNetError(e);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(EvaluateSelfResponseBean responseBaseBean) {
+                        DebugUtil.d(TAG,"uploadStrImgFile::onNext::responseBaseBean = " + responseBaseBean.code);
+                        DebugUtil.d(TAG,"uploadStrImgFile::onNext::listener = " + listener);
+                        if(responseBaseBean.code == 0){
+                            if(listener != null){
+                                DebugUtil.d(TAG,"uploadStrImgFile::listener.onSuccess");
                                 listener.onSuccess(responseBaseBean);
                             }
                         }else{

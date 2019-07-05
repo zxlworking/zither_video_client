@@ -1,5 +1,6 @@
 package com.zxl.zither.video.http;
 
+import com.zxl.zither.video.model.response.EvaluateSelfResponseBean;
 import com.zxl.zither.video.model.response.FileInfoResponse;
 import com.zxl.zither.video.model.response.LoginResponseBean;
 import com.zxl.zither.video.model.response.ResponseBaseBean;
@@ -41,7 +42,10 @@ public interface HttpAPI {
     @POST("upload_video_file")
 //    public Observable<ResponseBaseBean> uploadVideoFile(@QueryMap Map<String,String> params, @PartMap HashMap<String,RequestBody> bodyMap);
     public Observable<ResponseBaseBean> uploadVideoFile(@QueryMap Map<String,String> params, @Body RequestBody multipartBody);
-//    public Call<ResponseBody> uploadVideoFile(@QueryMap Map<String,String> params, @Body RequestBody multipartBody);
+
+    @POST("test/star/evaluate_self?test_param=test_param_value")
+    public Observable<EvaluateSelfResponseBean> uploadStarImgFile(@QueryMap Map<String,String> params, @Body RequestBody multipartBody);
+//    public Call<ResponseBody> uploadStarImgFile(@QueryMap Map<String,String> params, @Body RequestBody multipartBody);
 
     @POST("upload_file")
     public Call<ResponseBody> uploadFile(@Body RequestBody multipartBody);
