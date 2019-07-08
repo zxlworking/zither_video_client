@@ -154,13 +154,13 @@ public class UpLoadStarFileActivity extends BaseActivity {
                 HttpUtils.getInstance().uploadStrImgFile(params, fileRequestBody, new NetRequestListener() {
                     @Override
                     public void onSuccess(ResponseBaseBean responseBaseBean) {
-                        Toast.makeText(mActivity, "上传完成", Toast.LENGTH_SHORT).show();
-                        DebugUtil.d(TAG, "uploadStrImgFile::onSuccess::responseBaseBean = " + responseBaseBean);
-                        EvaluateSelfResponseBean responseBean = (EvaluateSelfResponseBean) responseBaseBean;
-                        if (responseBean.code != 0) {
+                        EvaluateSelfResponseBean evaluateSelfResponseBean = (EvaluateSelfResponseBean) responseBaseBean;
+                        DebugUtil.d(TAG, "uploadStrImgFile::onSuccess::evaluateSelfResponseBean = " + evaluateSelfResponseBean);
+                        if (evaluateSelfResponseBean.mResponseBaseBean.code != 0) {
                             Toast.makeText(mActivity, "未找到匹配信息", Toast.LENGTH_SHORT).show();
                         } else {
-                            mSearchResultAdapter.setData(((EvaluateSelfResponseBean) responseBaseBean).mEvaluateSelfInfoList);
+                            Toast.makeText(mActivity, "上传完成", Toast.LENGTH_SHORT).show();
+                            mSearchResultAdapter.setData(evaluateSelfResponseBean.mEvaluateSelfInfoList);
                         }
                     }
 
