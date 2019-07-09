@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -15,9 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.zxl.common.DebugUtil;
 import com.zxl.zither.video.R;
 import com.zxl.zither.video.common.CommonUtils;
+import com.zxl.zither.video.common.DebugUtil;
 import com.zxl.zither.video.http.FileRequestBody;
 import com.zxl.zither.video.http.HttpUtils;
 import com.zxl.zither.video.http.RetrofitCallback;
@@ -45,7 +46,7 @@ import retrofit2.Response;
  */
 public class UpLoadStarFileActivity extends BaseActivity {
 
-    private static final String TAG = "";
+    private static final String TAG = "UpLoadStarFileActivity";
 
     private static final int OPEN_GALLERY_REQUEST_CODE = 3;
 
@@ -117,7 +118,8 @@ public class UpLoadStarFileActivity extends BaseActivity {
         mChooseStarTv = findViewById(R.id.choose_star_tv);
         mSearchResultRecyclerView = findViewById(R.id.search_result_recycler_view);
 
-        mSearchResultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        mSearchResultRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mSearchResultRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         mSearchResultAdapter = new SearchResultAdapter();
         mSearchResultRecyclerView.setAdapter(mSearchResultAdapter);
 
@@ -158,6 +160,7 @@ public class UpLoadStarFileActivity extends BaseActivity {
                         DebugUtil.d(TAG, "uploadStrImgFile::onSuccess::evaluateSelfResponseBean = " + evaluateSelfResponseBean);
                         if (evaluateSelfResponseBean.mResponseBaseBean.code != 0) {
                             Toast.makeText(mActivity, "未找到匹配信息", Toast.LENGTH_SHORT).show();
+                            mSearchResultAdapter.setData(null);
                         } else {
                             Toast.makeText(mActivity, "上传完成", Toast.LENGTH_SHORT).show();
                             mSearchResultAdapter.setData(evaluateSelfResponseBean.mEvaluateSelfInfoList);
@@ -215,7 +218,9 @@ public class UpLoadStarFileActivity extends BaseActivity {
 
         public void setData(List<EvaluateSelfInfo> list) {
             mEvaluateSelfInfoList.clear();
-            mEvaluateSelfInfoList.addAll(list);
+            if(list != null){
+                mEvaluateSelfInfoList.addAll(list);
+            }
             notifyDataSetChanged();
         }
 
@@ -228,10 +233,10 @@ public class UpLoadStarFileActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(@NonNull SearchResultHolder searchResultHolder, int i) {
-            EvaluateSelfInfo evaluateSelfInfo = mEvaluateSelfInfoList.get(i);
+            final EvaluateSelfInfo evaluateSelfInfo = mEvaluateSelfInfoList.get(i);
 
             
-            DebugUtil.d(TAG, "onBindViewHolder::evaluateSelfInfo = " + evaluateSelfInfo);
+            //DebugUtil.d(TAG, "onBindViewHolder::evaluateSelfInfo = " + evaluateSelfInfo);
 
             Glide.with(searchResultHolder.mItemSearchStarImg).load(evaluateSelfInfo.mStarInfo.mStarImgUrl).into(searchResultHolder.mItemSearchStarImg);
 
@@ -239,6 +244,16 @@ public class UpLoadStarFileActivity extends BaseActivity {
 
             double mSimilarity = 100 * evaluateSelfInfo.mSimilarity;
             searchResultHolder.mItemSearchStarSimilarity.setText("相似度:" + mDecimalFormat.format(mSimilarity) + "%");
+
+            searchResultHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(mActivity, WebViewActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra(WebViewActivity.EXTRA_URL, evaluateSelfInfo.mStarInfo.mStarDetailUrl);
+                    startActivity(intent);
+                }
+            });
         }
 
         @Override

@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 
 import java.util.ArrayList;
 import java.util.List;

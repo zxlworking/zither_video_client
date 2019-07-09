@@ -9,7 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Toast;
 
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 import com.zxl.zither.video.R;
 import com.zxl.zither.video.event.LoginSuccessEvent;
 import com.zxl.zither.video.event.LogoutSuccessEvent;

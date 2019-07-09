@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 import com.zxl.zither.video.http.HttpGetProxy;
 
 import java.io.IOException;

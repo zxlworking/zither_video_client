@@ -7,7 +7,7 @@ import android.os.Looper;
 import android.os.Process;
 import android.widget.Toast;
 
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 import com.zxl.zither.video.utils.Constants;
 
 import java.io.File;

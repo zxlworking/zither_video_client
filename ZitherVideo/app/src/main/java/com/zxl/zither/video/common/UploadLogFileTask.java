@@ -3,7 +3,7 @@ package com.zxl.zither.video.common;
 import android.os.Handler;
 import android.os.HandlerThread;
 
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 import com.zxl.zither.video.event.UploadLogFileEvent;
 import com.zxl.zither.video.http.FileRequestBody;
 import com.zxl.zither.video.http.HttpUtils;

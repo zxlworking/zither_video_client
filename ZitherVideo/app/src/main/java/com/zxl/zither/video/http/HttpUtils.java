@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 import com.zxl.zither.video.common.CommonUtils;
 import com.zxl.zither.video.http.listener.NetRequestListener;
 import com.zxl.zither.video.model.data.UserInfo;
@@ -369,6 +369,44 @@ public class HttpUtils {
                         if(responseBaseBean.code == 0){
                             if(listener != null){
                                 DebugUtil.d(TAG,"uploadStrImgFile::listener.onSuccess");
+                                listener.onSuccess(responseBaseBean);
+                            }
+                        }else{
+                            if(listener != null){
+                                listener.onServerError(responseBaseBean);
+                            }
+                        }
+                    }
+                });
+    }
+
+    public void getStarInfoList(int page, int pageSize, final NetRequestListener listener){
+        DebugUtil.d(TAG,"getStarInfoList");
+
+        Observable<EvaluateSelfResponseBean> observable = mHttpAPI.getStarInfoList(page, pageSize);
+        observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<EvaluateSelfResponseBean>() {
+                    @Override
+                    public void onCompleted() {
+                        DebugUtil.d(TAG,"getStarInfoList::onCompleted");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        DebugUtil.d(TAG,"getStarInfoList::onError::e = " + e);
+                        if(listener != null){
+                            listener.onNetError(e);
+                        }
+                    }
+
+                    @Override
+                    public void onNext(EvaluateSelfResponseBean responseBaseBean) {
+                        DebugUtil.d(TAG,"getStarInfoList::onNext::responseBaseBean = " + responseBaseBean.code);
+                        DebugUtil.d(TAG,"getStarInfoList::onNext::listener = " + listener);
+                        if(responseBaseBean.code == 0){
+                            if(listener != null){
+                                DebugUtil.d(TAG,"getStarInfoList::listener.onSuccess");
                                 listener.onSuccess(responseBaseBean);
                             }
                         }else{

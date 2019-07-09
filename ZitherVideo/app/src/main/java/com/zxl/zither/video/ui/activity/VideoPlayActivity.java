@@ -18,7 +18,7 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 import com.zxl.zither.video.R;
 import com.zxl.zither.video.common.CommonUtils;
 import com.zxl.zither.video.model.data.FileInfo;

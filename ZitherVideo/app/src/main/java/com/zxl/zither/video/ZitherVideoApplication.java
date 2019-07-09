@@ -3,7 +3,7 @@ package com.zxl.zither.video;
 import android.app.Application;
 import android.support.v7.app.AppCompatDelegate;
 
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 import com.zxl.zither.video.common.GlobalCrashHandler;
 import com.zxl.zither.video.utils.EventBusUtils;
 

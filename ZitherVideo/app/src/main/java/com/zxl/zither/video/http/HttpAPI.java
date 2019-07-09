@@ -47,6 +47,9 @@ public interface HttpAPI {
     public Observable<EvaluateSelfResponseBean> uploadStarImgFile(@QueryMap Map<String,String> params, @Body RequestBody multipartBody);
 //    public Call<ResponseBody> uploadStarImgFile(@QueryMap Map<String,String> params, @Body RequestBody multipartBody);
 
+    @GET("/test/star/star_info_list")
+    public Observable<EvaluateSelfResponseBean> getStarInfoList(@Query("page")int page, @Query("page_size")int pageSize);
+
     @POST("upload_file")
     public Call<ResponseBody> uploadFile(@Body RequestBody multipartBody);
 }

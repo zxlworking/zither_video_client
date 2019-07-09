@@ -2,7 +2,7 @@ package com.zxl.zither.video.http;
 
 import android.text.TextUtils;
 
-import com.zxl.common.DebugUtil;
+import com.zxl.zither.video.common.DebugUtil;
 
 import java.io.IOException;
 import java.net.InetAddress;
