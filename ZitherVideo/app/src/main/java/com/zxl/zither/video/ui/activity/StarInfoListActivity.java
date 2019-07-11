@@ -3,6 +3,7 @@ package com.zxl.zither.video.ui.activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,9 +112,10 @@ public class StarInfoListActivity extends BaseActivity {
         private List<EvaluateSelfInfo> mEvaluateSelfInfoList = new ArrayList<>();
 
         public void setData(List<EvaluateSelfInfo> list) {
-            mEvaluateSelfInfoList.clear();
-            mEvaluateSelfInfoList.addAll(list);
-            notifyDataSetChanged();
+            if(list != null){
+                mEvaluateSelfInfoList.addAll(list);
+                notifyDataSetChanged();
+            }
         }
 
         @NonNull
@@ -125,12 +127,13 @@ public class StarInfoListActivity extends BaseActivity {
 
         @Override
         public void onBindViewHolder(@NonNull StarInfoHolder starInfoHolder, int position) {
-            int screenWidth = CommonUtils.screenWidth();
-            int screenHeight = CommonUtils.screenHeight();
-            int width = (screenWidth - CommonUtils.px2dip(16)) / 2;
-            int height = width * screenHeight / screenWidth;
-            starInfoHolder.itemView.getLayoutParams().width = width;
-            starInfoHolder.itemView.getLayoutParams().height = height;
+//            int screenWidth = CommonUtils.screenWidth();
+//            int screenHeight = CommonUtils.screenHeight();
+//            int width = (screenWidth - CommonUtils.px2dip(16)) / 3;
+//            int height = width * screenHeight / screenWidth;
+//            starInfoHolder.mItemSearchStarImg.getLayoutParams().width = width;
+//            starInfoHolder.mItemSearchStarImg.getLayoutParams().height = height;
+
             final EvaluateSelfInfo evaluateSelfInfo = mEvaluateSelfInfoList.get(position);
 
             Glide.with(starInfoHolder.mItemSearchStarImg).load(evaluateSelfInfo.mStarInfo.mStarImgUrl).into(starInfoHolder.mItemSearchStarImg);
